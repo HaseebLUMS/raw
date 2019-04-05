@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 using namespace std;
+//LSS with no duplicates
 
 int LSS(string str)
 {
