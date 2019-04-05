@@ -2,8 +2,7 @@
 #include "mine.h"
 
 using namespace std;
-// a global variable
-
+// My very first attempt to solve a problem by recursion, (not so clean code)
 
 
 int main(int argc, char const *argv[])
