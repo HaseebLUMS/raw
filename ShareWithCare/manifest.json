@@ -1,0 +1,21 @@
+{
+   "name": "ShareWithCare",
+   "description": "Takes care of with whom you shre your google sheets",
+   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+   "manifest_version": 2,
+   "version": "1.0",
+   "background": {
+      "scripts": [ "background.js" ]
+   },
+	 "permissions": [
+    "webNavigation",
+	    "activeTab",
+	    "<all_urls>"
+	],
+   "content_scripts":[
+    {
+      "matches":["http://*/*", "https://*/*"],
+      "js":["test.js"]
+    }
+   ]
+}

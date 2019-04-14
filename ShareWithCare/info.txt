@@ -1,0 +1,82 @@
+docs-titlebar-share-client-button => share button id
+link = document.getElementById('docs-titlebar-share-client-button')
+link.addEventListener('click', () => console.log('\n\nShare Pressed\n\n'), false)
+
+
+chrome.webNavigation.onCompleted.addListener(function(details) {
+	console.log('Page Navigated')
+
+	chrome.tabs.executeScript({
+    	code: '(' + 
+    	function(){
+   //  		link = document.getElementById('docs-titlebar-share-client-button')
+   //  		function sleep (time) {
+			//   return new Promise((resolve) => setTimeout(resolve, time));
+			// }
+   //  		link.addEventListener('click', () => 
+   //  			{
+   //  				console.log('Share Pressed');
+   //  				sleep(3000).then(() => {
+   //  					console.log('Current Permission: ', (document.getElementById(':1n')).innerHTML)
+   //  				})
+   //  			}, false)
+   //  		return 'Success'
+
+   		document.addEventListener('click', function(e) {
+		    e = e || window.event;
+		    var target = e.target || e.srcElement,
+		        text = target.textContent || target.innerText;
+		    console.log(text)
+		}, false);
+
+    	} + ')();' //argument here is a string but function.toString() returns function's code
+    	},
+    	(results) => {
+        	//Here we have just the innerHTML and not DOM structure
+        	console.log(results[0]);
+    	}
+    );
+});
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('click', function(e) {
+    e = e || window.event;
+    var target = e.target || e.srcElement,
+        text = target.textContent || target.innerText;
+        console.log(text)
+
+    // var htmlobj = null
+    // if(text.includes('Share')){
+    //     console.log('Share Clicked')
+    //     document.addEventListener('mouseover', function(e) {
+    //         e = e || window.event;
+    //         var target = e.target || e.srcElement,
+    //             text = target.textContent || target.innerText;
+    //             console.log(text)
+    //             htmlobj = target
+    //     }, false);
+    // }
+
+    // tagname = target.tagName
+    // if(tagname == 'IFRAME'){
+    //     console.log('iframe found')
+    //     $("ifram").load(function(){
+    //         $(this).contents().on("click, mouseover", function(){
+    //           console.log(this)  
+    //         })
+    //     })
+    // }
+
+    
+    console.log(getElementByXpath('//*[@id="docs-titlebar-share-client-button"]/div'))
+    //chrome.runtime.sendMessage(target)
+}, false);
