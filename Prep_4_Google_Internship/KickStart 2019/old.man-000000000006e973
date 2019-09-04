@@ -1,0 +1,116 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <stdio.h>
+#include <deque>
+#include <string>
+
+using namespace std;
+
+int check(int k, int n, int m, vector<vector<int>> &dist) {
+    vector<vector<int>> sum(n, vector<int>(m+1, 0));
+    int total = 0;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            int val  =0;
+            if (dist[i][j] > k) {
+                val = 1;
+                total++;
+            };
+            sum[i][j+1] = sum[i][j]+val;
+        };
+    };
+
+    for (int i = 0; i < n; ++i) 
+        for (int j = 0; j < m; ++j) {
+            bool flag = true;
+            int s0 = 0;
+            for (int l = max(0, i-k); l <= min(n-1, i+k); ++l) {
+                int v_diff = abs(i-l);
+                int h_diff = k-v_diff;
+                int left = max(0, j-h_diff);
+                int right = min(m-1, j+h_diff);
+                int s = sum[l][right+1]-sum[l][left];
+                s0 += s;
+            };
+            if (s0 == total) {
+                return true;
+            }
+        };
+    return false;
+};
+
+int solve(int n, int m, vector<vector<int>> &dist) {
+    int low = 0;
+    int high = n+m;
+    while (low < high) {
+        if (low == high-1) {
+            if (check(low, n, m, dist)) {
+                return low;
+            }
+            return high;
+        };
+        int mid = low+(high-low)/2;
+        if (check(mid, n, m, dist)) {
+            high = mid;
+        }
+        else
+        {
+            low = mid;
+        };        
+    };
+    return low;
+}
+
+
+int main() {
+    //freopen("B.in", "r", stdin);
+
+    int t;
+    cin >> t;
+    for (int i0 = 1; i0 <= t; ++i0) {
+        int n, m;
+        cin >> n >> m;
+        vector<string> board(n);
+        for (int i = 0; i < n; ++i)
+            cin >> board[i];
+
+        deque<pair<int,int>> queue;
+        vector<vector<int>> dist(n, vector<int>(m, -1));
+
+        for (int i = 0; i < n; ++i)
+            for (int j = 0; j < m; ++j)
+                if (board[i][j] == '1') {
+                    queue.push_back(make_pair(i,j));
+                    dist[i][j] = 0;
+                };
+        
+        vector<vector<int>> d = {{0,1},{1,0},{-1,0},{0,-1}};
+
+        while (queue.size()) {
+            auto top = queue.front();
+            queue.pop_front();
+            for (int k = 0; k < 4; ++k) {
+                int ny = top.first+d[k][0];
+                int nx = top.second+d[k][1];
+                if (ny >= 0 && ny < n && nx >= 0 && nx < m && board[ny][nx] == '0' && dist[ny][nx] == -1) {
+                    dist[ny][nx] = dist[top.first][top.second]+1;
+                    queue.push_back({ny,nx});
+                };
+            };
+        };
+
+        int max_dist = 0;
+        for (int i = 0; i < n; ++i) 
+            for (int j = 0; j < m; ++j) {
+                max_dist = max(max_dist, dist[i][j]);
+            };
+        if (max_dist == 0) {
+            printf("Case #%d: 0\n", i0);
+            continue;
+        };
+
+        int ans = solve(n, m, dist);
+        printf("Case #%d: %d\n", i0, ans);
+    }       
+}

@@ -2,7 +2,6 @@
 #include <vector>
 #include <map>
 #include <unordered_set>
-#include <algorithm>
 
 using namespace std;
 
@@ -17,7 +16,6 @@ public:
             }
         }
         reverse(topo.begin(), topo.end());
-        
         return topo;
     }
 private:
@@ -60,8 +58,8 @@ int main()
 	pr.push_back(make_pair(3, 2));
 	pr.push_back(make_pair(1, 3));
 
-	// bool ans = s.canFinish(4, pr);
-	// cout << endl<< ans << endl;
+	bool ans = s.canFinish(4, pr);
+	cout << endl<< ans << endl;
 	return 0;
 }
 

@@ -1,0 +1,115 @@
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <map>
+#include <set>
+
+using namespace std;
+
+bool check(int k, vector<pair<int,int>> &pairs, vector<int> &rev_dict) {
+    if (k == 0) return true;
+
+    int q = pairs.size();
+    vector<bool> flag(q, false);
+    int m = rev_dict.size();
+    vector<set<int>> occupy(m);
+    for (int i = 0; i < q; ++i)
+        for (int j = pairs[i].first; j < pairs[i].second; ++j)
+            occupy[j].insert(i);
+
+    vector<int> value(q);
+    for (int i = 0; i < m-1; ++i)
+        if (occupy[i].size() == 1) {
+            int len = rev_dict[i+1]-rev_dict[i];
+            value[*occupy[i].begin()] += len;
+        }
+
+    //for (int i = 0; i < q; ++i) printf("%d " , value[i]);
+    //printf("k=%d\n", k);
+
+    for (int i = 0; i < q; ++i) {
+        bool found = false;
+        for (int j = 0; j < q; ++j) {            
+            if (value[j] >= k) {
+                found  =true;
+                value[j] = -1;
+                for (int l = pairs[j].first; l < pairs[j].second; ++l) {
+                    occupy[l].erase(j);
+                    if (occupy[l].size() == 1) {
+                        int len = rev_dict[l+1]-rev_dict[l];
+                        value[*occupy[l].begin()] += len;
+                    }
+                }
+                break;
+            }
+        };
+        //for (int j = 0; j < q; ++j) printf("%d " , value[j]);
+        //printf("i=%d k=%d\n", i, k);
+
+        if (!found) return false;
+    };
+    return true;
+};
+
+int solve(vector<pair<int,int>> &pairs, vector<int> &rev_dict) {
+    int low = 0;
+    int high = 1'000'000'001;
+
+    while (low < high) {
+        if (low == high-1) {
+            if (check(high, pairs, rev_dict)) return high;
+            return low;
+        };
+        int mid = low+(high-low)/2;
+        if (check(mid, pairs, rev_dict)) {
+            low = mid;
+        }
+        else
+        {
+            high = mid;
+        };
+        
+    };
+    return low;
+
+}
+
+int main() {
+    //freopen("C.in", "r", stdin);
+
+    int t;
+    cin >> t;
+    for (int i0 = 1; i0 <= t; ++i0) {
+        int n, q;
+        cin >> n >> q;
+        vector<pair<int,int>> seg;
+        set<int> points;    
+        for (int i = 0; i < q; ++i) {
+            int l,r;
+            cin >> l >> r;
+            r++;
+            seg.push_back({l,r});
+            points.insert(l);
+            points.insert(r);
+        };
+        points.insert(1'000'0000);
+        points.insert(0);
+
+        map<int,int> point_dict;
+        vector<int> rev_point_dict;
+        for (auto &p: points) {
+            int l = point_dict.size();
+            point_dict[p] = l;
+            rev_point_dict.push_back(p);
+        };
+
+        vector<pair<int,int>> pairs;
+        for (auto &p: seg)
+            pairs.push_back({point_dict[p.first], point_dict[p.second]});   
+
+        auto ans = solve(pairs, rev_point_dict);        
+        printf("Case #%d: %d\n", i0, ans);
+    };
+
+}

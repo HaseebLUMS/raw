@@ -1,0 +1,137 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+using namespace std;
+#define popCnt(x) (__builtin_popcountll(x))
+typedef unsigned long long Long;
+
+const int N = 255;
+
+bool grid[N][N];
+int cost[N][N];
+
+int r, c;
+
+void printCost() {
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      cout << cost[i][j] << " ";
+    }
+    cout << endl;
+  }
+  cout << endl;
+}
+
+void initCost() {
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      if (grid[i][j]) {
+        cost[i][j] = 0;
+      } else {
+        cost[i][j] = 2 * N;
+      }
+    }
+  }
+}
+
+void buildCostRow(int i) {
+  for (int j = 1; j < c; ++j) {
+    cost[i][j] = min(cost[i][j], cost[i][j - 1] + 1);
+  }
+
+  for (int j = c - 2; j >= 0; --j) {
+    cost[i][j] = min(cost[i][j], cost[i][j + 1] + 1);
+  }
+}
+
+void buildCostGrid() {
+  initCost();
+  for (int i = 0; i < r; ++i) {
+    if (i > 0) {
+      for (int j = 0; j < c; ++j) {
+        cost[i][j] = min(cost[i][j], cost[i - 1][j] + 1);
+      }
+    }
+    buildCostRow(i);
+  }
+
+  for (int i = r - 1; i >= 0; --i) {
+    if (i < r - 1) {
+      for (int j = 0; j < c; ++j) {
+        cost[i][j] = min(cost[i][j], cost[i + 1][j] + 1);
+      }
+    }
+    buildCostRow(i);
+  }
+}
+
+int memo[N][N][2 * N][2];
+
+void buildMemo() {
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      for (int k = 0; k + 5 < 2 * N; ++k) {
+        int tmp = min(k, cost[i][j]);
+        memo[i][j][k][0] = max(tmp, (j == 0 ? 0 : memo[i][j - 1][tmp + 1][0]));
+      }
+    }
+
+    for (int j = c - 1; j >= 0; --j) {
+      for (int k = 0; k + 5 < 2 * N; ++k) {
+        int tmp = min(k, cost[i][j]);
+        memo[i][j][k][1] = max(tmp,
+          (j == c - 1 ? 0 : memo[i][j + 1][tmp + 1][1]));
+      }
+    }
+  }
+}
+
+int solve() {
+  buildCostGrid();
+  buildMemo();
+  int res = INT_MAX;
+
+  for (int i = 0; i < r; ++i) {
+    for (int j = 0; j < c; ++j) {
+      int cst = 0;
+      for (int k = 0; k < r; ++k) {
+        cst = max(cst, memo[k][j][abs(k - i)][0]);
+        cst = max(cst, memo[k][j][abs(k - i)][1]);
+      }
+      res = min(res , cst);
+    }
+  }
+
+  return res;
+}
+
+int main() {
+  ios_base::sync_with_stdio(0), cin.tie(0), cout.tie(0);
+#ifdef Local
+  freopen("test.in", "r", stdin);
+#else
+#define endl '\n'
+#endif
+
+  int t;
+  cin >> t;
+
+  for (int cs = 1; cs <= t; ++cs) {
+    cout << "Case #" << cs << ": ";
+
+    cin >> r >> c;
+
+    for (int i = 0; i < r; ++i) {
+      for (int j = 0; j < c; ++j) {
+        char x;
+        cin >> x;
+        grid[i][j] = (x == '1');
+      }
+    }
+
+    cout << solve() << endl;
+
+  }
+
+}
+
